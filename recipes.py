@@ -103,3 +103,51 @@ class Recipe:
             recipe_lines.append(f"- {ingredient}")
         return "\n".join(recipe_lines)
     
+
+
+
+
+class ShoppingList:
+    def __init__(self):
+        self._items = []
+
+    def add_recipe(
+        self,
+        recipe: Recipe,
+        portions: float):
+        if portions <= 0:
+            raise ValueError("необходимо положительно число порций")
+        scaled_recipe = recipe.scale(portions)
+        for ingredient in scaled_recipe.ingredients:
+            self._items.append(
+                (ingredient, recipe.title))
+
+    def remove_recipe(
+        self,
+        title: str):
+        self._items = [
+            item
+            for item in self._items
+            if item[1] != title]
+
+    def get_list(self):
+        ingredients_storage = {}
+        for ingredient, _ in self._items:
+            key = (ingredient.name,ingredient.unit)
+            ingredients_storage[key] = (
+                ingredients_storage.get(key, 0)
+                + ingredient.quantity)
+        result = []
+        for (name,unit), quantity in ingredients_storage.items():
+            result.append(Ingredient(name,quantity,unit))
+        result.sort(
+            key=lambda ingredient:
+            ingredient.name)
+        return result
+
+    def __add__(self,other):
+        merged = ShoppingList()
+        merged._items = (
+            self._items[:] +
+            other._items[:])
+        return merged
