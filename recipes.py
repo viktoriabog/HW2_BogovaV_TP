@@ -36,4 +36,70 @@ class Ingredient:
             self.name == other.name
             and self.unit == other.unit
         )
-  
+
+class Recipe:
+    def __init__(
+        self,
+        title: str,
+        ingredients=None
+    ):
+        self.title = title
+        self.ingredients = (
+            ingredients[:]
+            if ingredients
+            else []
+        )
+
+    def add_ingredient(
+        self,
+        ingredient: Ingredient):
+
+        for current in self.ingredients:
+
+            if current == ingredient:
+                current.quantity += (
+                    ingredient.quantity)
+                return
+
+        self.ingredients.append(ingredient)
+
+    @staticmethod
+    def is_valid_ratio(ratio):
+        return (
+            isinstance(
+                ratio,
+                (int, float)
+            )
+            and ratio > 0)
+
+    def scale(
+        self,
+        ratio: float):
+        if not self.is_valid_ratio(
+            ratio):
+            raise ValueError("неподходящий коэффициент")
+
+        scaled_ingredients = []
+        for ingredient in self.ingredients:
+            scaled_ingredients.append(
+                Ingredient(
+                    ingredient.name,
+                    ingredient.quantity*ratio,
+                    ingredient.unit
+                )
+            )
+        return Recipe(
+            self.title,
+            scaled_ingredients
+        )
+
+    def __len__(self):
+        return len(self.ingredients)
+    
+    def __str__(self):
+
+        recipe_lines = [self.title]
+        for ingredient in self.ingredients:
+            recipe_lines.append(f"- {ingredient}")
+        return "\n".join(recipe_lines)
+    
